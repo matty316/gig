@@ -1,5 +1,5 @@
 #pragma once
 
-class Camera3D;
+#include <raylib.h>
 
 void updateInput(Camera3D &camera);

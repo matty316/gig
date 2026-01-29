@@ -1,5 +1,4 @@
 #include <input.hpp>
-#include <raylib.h>
 #include <raymath.h>
 
 constexpr float mouseSensitivity = 0.01f;

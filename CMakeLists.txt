@@ -13,6 +13,5 @@ add_executable(${CMAKE_PROJECT_NAME} "${MY_SOURCES}" "${MY_HEADERS}")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib)
-target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE OPEGL)
 
 target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Wall -Wextra -g)
