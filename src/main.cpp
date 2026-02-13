@@ -1,7 +1,8 @@
 #include <game.hpp>
 
 int main() {
-  init();
-  run();
-  cleanup();
+  Game game;
+  game.init();
+  game.run();
+  game.cleanup();
 }

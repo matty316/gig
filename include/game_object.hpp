@@ -9,17 +9,23 @@ struct Movement {
   bool right = false;
 };
 
-struct GameObject {
-  Vector3 pos, scale, velocity, acceleration, forceAccum;
-  float rotationAngle, damping, inverseMass;
-  Movement movement;
-  Model model;
-
+class GameObject {
+public:
   void init();
-  void setMass(float mass);
-  void addForce(Vector3 force);
   void update();
-  void clearAccum();
   void draw();
   void cleanup();
+
+  Vector3 pos;
+  float rotationAngle;
+  Movement movement;
+
+private:
+  Vector3 scale, velocity, acceleration, forceAccum;
+  float damping, inverseMass;
+  Model model;
+
+  void setMass(float mass);
+  void addForce(Vector3 force);
+  void clearAccum();
 };
