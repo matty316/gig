@@ -18,7 +18,7 @@ struct GameObject {
   void init();
   void setMass(float mass);
   void addForce(Vector3 force);
-  void update(float deltaTime);
+  void update();
   void clearAccum();
   void draw();
   void cleanup();

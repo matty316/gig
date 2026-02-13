@@ -22,12 +22,13 @@ void GameObject::init() {
   damping = 0.1f;
   rotationAngle = 0.0f;
   setMass(100.0f);
-  float scaleVal = 1.0f;
+  float scaleVal = .5f;
   scale = {scaleVal, scaleVal, scaleVal};
   model = LoadModel("models/cartoon_car/scene.gltf");
 }
 
-void GameObject::update(float deltaTime) {
+void GameObject::update() {
+  float deltaTime = GetFrameTime();
   if (inverseMass <= 0.0f) return;
 
   float rotation = 0.0f;

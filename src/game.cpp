@@ -6,7 +6,7 @@
 
 constexpr int SCREEN_WIDTH = 1920;
 constexpr int SCREEN_HEIGHT = 1080;
-Camera3D camera;
+PlayerCamera camera;
 GameObject player;
 
 void init() {
@@ -14,26 +14,26 @@ void init() {
   ToggleFullscreen();
   SetTargetFPS(60);
   player.init();
-  initCamera(camera, player);
+  camera.init(player);
   DisableCursor();
 }
 
 void update() {
   player.movement = updateInput();
-  player.update(GetFrameTime());
-  updateCamera(camera, player);
+  player.update();
+  camera.update(player);
 }
 
 void draw() {
   BeginDrawing();
   ClearBackground(RAYWHITE);
 
-  BeginMode3D(camera);
+  camera.begin();
 
   player.draw();
   DrawGrid(10000, 1.0f);
 
-  EndMode3D();
+  camera.end();
 
   EndDrawing();
 }

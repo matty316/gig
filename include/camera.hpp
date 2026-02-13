@@ -3,5 +3,12 @@
 #include <raylib.h>
 #include <game_object.hpp>
 
-void initCamera(Camera3D &camera, GameObject &player);
-void updateCamera(Camera3D &camera, GameObject &player);
+class PlayerCamera {
+public:
+  void init(GameObject &player);
+  void update(GameObject &player);
+  void begin();
+  void end();
+private:
+  Camera3D camera;
+};
