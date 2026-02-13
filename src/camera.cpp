@@ -1,5 +1,6 @@
 #include <camera.hpp>
 #include <raymath.h>
+#include <consts.hpp>
 
 constexpr Vector3 up = {0.0f, 1.0f, 0.0f};
 constexpr Vector3 targetOffset = {0.0f, 7.5f, 20.0f};
@@ -13,7 +14,6 @@ void PlayerCamera::init(GameObject &player) {
 }
 
 void PlayerCamera::update(GameObject &player) {
-  constexpr float angleAdjustment = 90.0f * DEG2RAD;
   camera.position.x = player.pos.x - cos(player.rotationAngle + angleAdjustment) * targetOffset.z;
   camera.position.z = player.pos.z - sin(player.rotationAngle + angleAdjustment) * targetOffset.z;
   camera.position.y = player.pos.y + targetOffset.y;

@@ -1,10 +1,10 @@
 #include <game_object.hpp>
 #include <raymath.h>
+#include <consts.hpp>
 
 constexpr float angle = 90.0f * DEG2RAD;
 constexpr float turningMin = 20.0f;
 constexpr float accelMagnitude = 200.0f;
-constexpr float angleAdjustment = 90.0f * DEG2RAD;
 
 void GameObject::setMass(float mass) {
   inverseMass = 1.0f / mass;
