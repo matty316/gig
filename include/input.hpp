@@ -1,5 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <camera.hpp>
+#include <game_object.hpp>
 
-void updateInput(Camera3D &camera);
+Movement updateInput();

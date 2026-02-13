@@ -1,0 +1,13 @@
+[
+  {
+    "label": "debug",
+    "build": {
+      "command": "./clean.sh && ./build.sh",
+      "args": [],
+    },
+    "program": "build/app",
+    "args": [],
+    "request": "launch",
+    "adapter": "GDB",
+  },
+]

@@ -1,19 +1,13 @@
 #include <input.hpp>
 #include <raymath.h>
 
-constexpr float mouseSensitivity = 0.01f;
+Movement updateInput() {
+  Movement movement;
 
-void updateInput(Camera3D &camera) {
-  auto mouseDelta = GetMouseDelta();
+  movement.forward = IsKeyDown(KEY_SPACE);
+  movement.backward = IsKeyDown(KEY_LEFT_SHIFT);
+  movement.left = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
+  movement.right = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
 
-  camera.target.x += mouseDelta.x * mouseSensitivity;
-  camera.target.y -= mouseDelta.y * mouseSensitivity;
-
-  Vector3 velocity{};
-  if (IsKeyDown(KEY_W)) velocity.x += 1;
-  if (IsKeyDown(KEY_S)) velocity.x -= 1;
-  if (IsKeyDown(KEY_D)) velocity.z += 1;
-  if (IsKeyDown(KEY_A)) velocity.z -= 1;
-
-  camera.position += velocity;
+  return movement;
 }
