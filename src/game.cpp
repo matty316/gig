@@ -28,7 +28,6 @@ void Game::draw() {
 
   player.draw();
   DrawGrid(10000, 1.0f);
-  DrawPlane({0.0f, 0.0f, 0.0f}, {10000, 10000}, PURPLE);
 
   camera.end();
 
