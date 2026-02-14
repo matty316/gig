@@ -11,7 +11,9 @@ public:
 private:
   void update();
   void draw();
+  void loadSkybox();
 
   PlayerCamera camera;
   GameObject player;
+  Model skybox;
 };

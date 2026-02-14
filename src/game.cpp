@@ -1,5 +1,6 @@
 #include <game.hpp>
 #include <raylib.h>
+#include <rlgl.h>
 #include <input.hpp>
 
 constexpr int SCREEN_WIDTH = 1920;
@@ -11,6 +12,7 @@ void Game::init() {
   SetTargetFPS(60);
   player.init();
   camera.init(player);
+  loadSkybox();
   DisableCursor();
 }
 
@@ -25,6 +27,13 @@ void Game::draw() {
   ClearBackground(RAYWHITE);
 
   camera.begin();
+
+  //draw skybox
+  rlDisableBackfaceCulling();
+  rlDisableDepthMask();
+  DrawModel(skybox, (Vector3){0, 0, 0}, 1.0f, WHITE);
+  rlEnableBackfaceCulling();
+  rlEnableDepthMask();
 
   player.draw();
   DrawGrid(10000, 1.0f);
@@ -44,4 +53,23 @@ void Game::run() {
 void Game::cleanup() {
   player.cleanup();
   CloseWindow();
+}
+
+void Game::loadSkybox() {
+  Mesh cube = GenMeshCube(1.0f, 1.0f, 1.0f);
+  skybox = LoadModelFromMesh(cube);
+
+  skybox.materials[0].shader = LoadShader("shaders/skybox.vs", "shaders/skybox.fs");
+
+  SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "environmentMap"), (int[1]){ MATERIAL_MAP_CUBEMAP}, SHADER_UNIFORM_INT);
+  SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "doGamma"), (int[1]){ 0 }, SHADER_UNIFORM_INT);
+  SetShaderValue(skybox.materials[0].shader, GetShaderLocation(skybox.materials[0].shader, "vflipped"), (int[1]){ 0 }, SHADER_UNIFORM_INT);
+
+  Shader shdrCubemap = LoadShader("shaders/cubemap.vs", "shaders/cubemap.fs");
+
+  SetShaderValue(shdrCubemap, GetShaderLocation(shdrCubemap, "equirectangularMap"), (int[1]){ 0 }, SHADER_UNIFORM_INT);
+
+  Image image = LoadImage("textures/skybox2.png");
+  skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture = LoadTextureCubemap(image, CUBEMAP_LAYOUT_AUTO_DETECT);
+  UnloadImage(image);
 }
