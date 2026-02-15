@@ -1,6 +1,5 @@
 #include "raylib.h"
 #include <input.hpp>
-#include <print>
 #include <raymath.h>
 
 constexpr float leftStickDeadzoneX = 0.1f;
