@@ -2,7 +2,7 @@
 #include <raymath.h>
 #include <consts.hpp>
 
-constexpr float angle = 90.0f * DEG2RAD;
+constexpr float angle = 45.0f * DEG2RAD;
 constexpr float turningMin = 20.0f;
 constexpr float accelMagnitude = 200.0f;
 

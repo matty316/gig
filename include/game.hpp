@@ -12,6 +12,7 @@ private:
   void update();
   void draw();
   void loadSkybox();
+  void drawSkybox();
 
   PlayerCamera camera;
   GameObject player;

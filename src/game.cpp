@@ -28,17 +28,14 @@ void Game::draw() {
 
   camera.begin();
 
-  //draw skybox
-  rlDisableBackfaceCulling();
-  rlDisableDepthMask();
-  DrawModel(skybox, (Vector3){0, 0, 0}, 1.0f, WHITE);
-  rlEnableBackfaceCulling();
-  rlEnableDepthMask();
+  drawSkybox();
 
   player.draw();
   DrawGrid(10000, 1.0f);
 
   camera.end();
+
+  DrawFPS(10, 10);
 
   EndDrawing();
 }
@@ -72,4 +69,12 @@ void Game::loadSkybox() {
   Image image = LoadImage("textures/skybox2.png");
   skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture = LoadTextureCubemap(image, CUBEMAP_LAYOUT_AUTO_DETECT);
   UnloadImage(image);
+}
+
+void Game::drawSkybox() {
+    rlDisableBackfaceCulling();
+    rlDisableDepthMask();
+    DrawModel(skybox, (Vector3){0, 0, 0}, 1.0f, WHITE);
+    rlEnableBackfaceCulling();
+    rlEnableDepthMask();
 }
