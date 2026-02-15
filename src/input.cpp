@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <input.hpp>
+#include <print>
 #include <raymath.h>
 
 constexpr float leftStickDeadzoneX = 0.1f;
@@ -11,11 +12,6 @@ constexpr float rightTriggerDeadzone = -0.9f;
 
 Movement updateInput() {
   Movement movement;
-
-  movement.forward = IsKeyDown(KEY_SPACE);
-  movement.backward = IsKeyDown(KEY_LEFT_SHIFT);
-  movement.left = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
-  movement.right = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
 
   int gamepad = 0;
 
@@ -34,8 +30,16 @@ Movement updateInput() {
     if (leftTrigger < leftTriggerDeadzone) leftTrigger = -1.0f;
     if (rightTrigger < rightTriggerDeadzone) rightTrigger = -1.0f;
 
-
-}
+    movement.forward = IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+    movement.backward = IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
+    movement.left = leftStickX < 0.0f || IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
+    movement.right = leftStickX > 0.0f || IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
+  } else {
+    movement.forward = IsKeyDown(KEY_SPACE);
+    movement.backward = IsKeyDown(KEY_LEFT_SHIFT);
+    movement.left = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
+    movement.right = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
+  }
 
   return movement;
 }

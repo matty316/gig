@@ -8,7 +8,7 @@ constexpr int SCREEN_HEIGHT = 1080;
 
 void Game::init() {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
-  ToggleFullscreen();
+ // ToggleFullscreen();
   SetTargetFPS(60);
   player.init();
   camera.init(player);
@@ -49,6 +49,9 @@ void Game::run() {
 
 void Game::cleanup() {
   player.cleanup();
+  UnloadShader(skybox.materials[0].shader);
+  UnloadTexture(skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture);
+  UnloadModel(skybox);
   CloseWindow();
 }
 
