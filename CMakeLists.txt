@@ -14,4 +14,4 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE raylib)
 
-target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE -Wall -Wextra -g)
+target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE)

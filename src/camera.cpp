@@ -28,3 +28,7 @@ void PlayerCamera::begin() {
 void PlayerCamera::end() {
   EndMode3D();
 }
+
+Vector3 PlayerCamera::pos() {
+  return camera.position;
+}

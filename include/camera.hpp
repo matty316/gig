@@ -9,6 +9,7 @@ public:
   void update(GameObject &player);
   void begin();
   void end();
+  Vector3 pos();
 private:
   Camera3D camera;
 };

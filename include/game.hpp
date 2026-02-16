@@ -2,6 +2,8 @@
 
 #include <camera.hpp>
 #include <game_object.hpp>
+#include <light.hpp>
+#include <vector>
 
 class Game {
 public:
@@ -13,8 +15,12 @@ private:
   void draw();
   void loadSkybox();
   void drawSkybox();
+  void setupLighting();
+  void drawLightingSpheres();
 
   PlayerCamera camera;
   GameObject player;
   Model skybox;
+  Shader lightingShader;
+  std::vector<Light> lights;
 };
