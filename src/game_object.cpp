@@ -14,7 +14,7 @@ void GameObject::addForce(Vector3 force) {
   forceAccum += force;
 }
 
-void GameObject::init() {
+void GameObject::init(const std::string modelPath) {
   pos = {0.0f, 0.5f, 0.0f};
   velocity = Vector3Zero();
   acceleration = Vector3Zero();
@@ -22,9 +22,9 @@ void GameObject::init() {
   damping = 0.1f;
   rotationAngle = 0.0f;
   setMass(100.0f);
-  float scaleVal = .5f;
+  float scaleVal = 0.02f;
   scale = {scaleVal, scaleVal, scaleVal};
-  model = LoadModel("models/cartoon_car/scene.gltf");
+  model = LoadModel(modelPath.c_str());
 }
 
 void GameObject::update() {

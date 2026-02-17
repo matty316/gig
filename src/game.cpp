@@ -10,9 +10,9 @@ constexpr int SCREEN_HEIGHT = 1080;
 
 void Game::init() {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
-  ToggleFullscreen();
+ // ToggleFullscreen();
   SetTargetFPS(60);
-  player.init();
+  player.init("models/old_rusty_car.glb");
   camera.init(player);
   setupLighting();
   loadSkybox();
@@ -39,13 +39,11 @@ void Game::draw() {
   drawSkybox();
 
   BeginShaderMode(lightingShader);
-
-  //player.draw();
-
-  DrawPlane(Vector3Zero(), {10000, 10000}, WHITE);
-  DrawCube(Vector3Zero(), 2.0, 4.0, 2.0, WHITE);
-
+  player.draw();
   EndShaderMode();
+
+  // DrawPlane(Vector3Zero(), {10000, 10000}, WHITE);
+  // DrawCube(Vector3Zero(), 2.0, 4.0, 2.0, WHITE);
 
   drawLightingSpheres();
 

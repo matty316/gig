@@ -10,7 +10,7 @@ enum LightType {
 static int lightsCount = 0;
 
 struct Light {
-  LightType type;
+  int type;
   bool enabled;
   Vector3 position;
   Vector3 target;
@@ -24,7 +24,12 @@ struct Light {
   int colorLoc;
   int attenuationLoc;
 
-  Light(LightType type, Vector3 position, Vector3 target, Color color, Shader shader) : type(type), position(position), target(target), color(color) {
+  Light(LightType type, Vector3 position, Vector3 target, Color color, Shader shader) {
+    this->type = type;
+    this->position = position;
+    this->target = target;
+    this->color = color;
+
     enabledLoc = GetShaderLocation(shader, TextFormat("lights[%i].enabled", lightsCount));
     typeLoc = GetShaderLocation(shader, TextFormat("lights[%i].type", lightsCount));
     positionLoc = GetShaderLocation(shader, TextFormat("lights[%i].position", lightsCount));

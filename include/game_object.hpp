@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <string>
 
 struct Movement {
   bool forward = false;
@@ -11,7 +12,7 @@ struct Movement {
 
 class GameObject {
 public:
-  void init();
+  void init(const std::string modelPath);
   void update();
   void draw();
   void cleanup();
