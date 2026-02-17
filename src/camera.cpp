@@ -3,7 +3,7 @@
 #include <consts.hpp>
 
 constexpr Vector3 up = {0.0f, 1.0f, 0.0f};
-constexpr Vector3 targetOffset = {0.0f, 7.5f, 10.0f};
+constexpr Vector3 targetOffset = {0.0f, 5.0f, 10.0f};
 
 void PlayerCamera::init(GameObject &player) {
   camera.position = player.pos - targetOffset;

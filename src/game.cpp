@@ -9,7 +9,7 @@
 void Game::init() {
   SetConfigFlags(FLAG_MSAA_4X_HINT);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
- // ToggleFullscreen();
+  ToggleFullscreen();
   SetTargetFPS(60);
   player.init("models/old_car_new.glb");
   camera.init(player);
@@ -39,9 +39,6 @@ void Game::draw() {
   BeginShaderMode(lightingShader);
   player.draw(lightingShader, textureTilingLoc, emissiveColorLoc, emissiveIntensityLoc);
   EndShaderMode();
-
-  // DrawPlane(Vector3Zero(), {10000, 10000}, WHITE);
-  // DrawCube(Vector3Zero(), 2.0, 4.0, 2.0, WHITE);
 
   drawLightingSpheres();
 
@@ -122,13 +119,13 @@ void Game::setupLighting() {
   emissiveColorLoc = GetShaderLocation(lightingShader, "emissiveColor");
   textureTilingLoc = GetShaderLocation(lightingShader, "tiling");
 
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, YELLOW, 4.0f, lightingShader));
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 3.3f, lightingShader));
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 8.3f, lightingShader));
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 2.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 4.0f, lightingShader));
 
-  // Setup material texture maps usage in shader
-  // NOTE: By default, the texture maps are always used
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, YELLOW, 4.0f, lightingShader));
+  // lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 3.3f, lightingShader));
+  // lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 8.3f, lightingShader));
+  // lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 2.0f, lightingShader));
+
   int usage = 1;
   SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexAlbedo"), &usage, SHADER_UNIFORM_INT);
   SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexNormal"), &usage, SHADER_UNIFORM_INT);
@@ -138,13 +135,15 @@ void Game::setupLighting() {
 
 void Game::drawLightingSpheres() {
   for (auto &light : lights) {
-    Color lightColor = (Color){
-        (unsigned char)(light.color[0]*255),
-        (unsigned char)(light.color[1]*255),
-        (unsigned char)(light.color[2]*255),
-        (unsigned char)(light.color[3]*255) };
+    if (light.type == LIGHT_POINT) {
+      Color lightColor = (Color){
+          (unsigned char)(light.color[0]*255),
+          (unsigned char)(light.color[1]*255),
+          (unsigned char)(light.color[2]*255),
+          (unsigned char)(light.color[3]*255) };
 
-    if (light.enabled) DrawSphereEx(light.position, 0.2f, 8, 8, lightColor);
-    else DrawSphereWires(light.position, 0.2f, 8, 8, ColorAlpha(lightColor, 0.3f));
+      if (light.enabled) DrawSphereEx(light.position, 0.2f, 8, 8, lightColor);
+      else DrawSphereWires(light.position, 0.2f, 8, 8, ColorAlpha(lightColor, 0.3f));
+    }
   }
 }
