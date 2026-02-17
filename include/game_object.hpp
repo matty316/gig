@@ -13,8 +13,9 @@ struct Movement {
 class GameObject {
 public:
   void init(const std::string modelPath);
+  void setupModelMaterials(Shader shader);
   void update();
-  void draw();
+  void draw(Shader shader, int textureTilingLoc, int emissiveColorLoc, int emissiveIntensityLoc);
   void cleanup();
 
   Vector3 pos;
@@ -25,6 +26,7 @@ private:
   Vector3 scale, velocity, acceleration, forceAccum;
   float damping, inverseMass;
   Model model;
+  Vector2 textureTiling;
 
   void setMass(float mass);
   void addForce(Vector3 force);

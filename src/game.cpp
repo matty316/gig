@@ -4,17 +4,17 @@
 #include <rlgl.h>
 #include <input.hpp>
 #include <light.hpp>
-
-constexpr int SCREEN_WIDTH = 1920;
-constexpr int SCREEN_HEIGHT = 1080;
+#include <consts.hpp>
 
 void Game::init() {
+  SetConfigFlags(FLAG_MSAA_4X_HINT);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
  // ToggleFullscreen();
   SetTargetFPS(60);
-  player.init("models/old_rusty_car.glb");
+  player.init("models/old_car_new.glb");
   camera.init(player);
   setupLighting();
+  player.setupModelMaterials(lightingShader);
   loadSkybox();
   DisableCursor();
 }
@@ -26,8 +26,6 @@ void Game::update() {
 
   float cameraPos[3] = { camera.pos().x, camera.pos().y, camera.pos().z };
   SetShaderValue(lightingShader, lightingShader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
-
-  for (auto &light : lights) light.updateLightValues(lightingShader);
 }
 
 void Game::draw() {
@@ -39,7 +37,7 @@ void Game::draw() {
   drawSkybox();
 
   BeginShaderMode(lightingShader);
-  player.draw();
+  player.draw(lightingShader, textureTilingLoc, emissiveColorLoc, emissiveIntensityLoc);
   EndShaderMode();
 
   // DrawPlane(Vector3Zero(), {10000, 10000}, WHITE);
@@ -100,22 +98,53 @@ void Game::drawSkybox() {
 }
 
 void Game::setupLighting() {
-  lightingShader = LoadShader("shaders/lighting.vs", "shaders/lighting.fs");
-  lightingShader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(lightingShader, "viewPos");
-  int ambientLoc = GetShaderLocation(lightingShader, "ambient");
-  SetShaderValue(lightingShader, ambientLoc, (float[4]){0.1f, 0.1f, 0.1f, 1.0f}, SHADER_UNIFORM_VEC4);
+  lightingShader = LoadShader("shaders/pbr.vs", "shaders/pbr.fs");
+  lightingShader.locs[SHADER_LOC_MAP_ALBEDO] = GetShaderLocation(lightingShader, "albedoMap");
+  lightingShader.locs[SHADER_LOC_MAP_METALNESS] = GetShaderLocation(lightingShader, "mraMap");
+  lightingShader.locs[SHADER_LOC_MAP_NORMAL] = GetShaderLocation(lightingShader, "normalMap");
+  lightingShader.locs[SHADER_LOC_MAP_EMISSION] = GetShaderLocation(lightingShader, "emissiveMap");
+  lightingShader.locs[SHADER_LOC_COLOR_DIFFUSE] = GetShaderLocation(lightingShader, "albedoColor");
 
-  lights = {
-    Light(LIGHT_POINT, (Vector3){ -2, 2, -2 }, Vector3Zero(), YELLOW, lightingShader),
-    Light(LIGHT_POINT, (Vector3){ 2, 2, 2 }, Vector3Zero(), RED, lightingShader),
-    Light(LIGHT_POINT, (Vector3){ -2, 2, 2 }, Vector3Zero(), GREEN, lightingShader),
-    Light(LIGHT_POINT, (Vector3){ 2, 2, -2 }, Vector3Zero(), BLUE, lightingShader),
-  };
+  lightingShader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(lightingShader, "viewPos");
+  int lightCountLoc = GetShaderLocation(lightingShader, "numOfLights");
+  int maxLightCount = MAX_LIGHTS;
+  SetShaderValue(lightingShader, lightCountLoc, &maxLightCount, SHADER_UNIFORM_INT);
+
+  float ambientIntensity = 0.02f;
+  Color ambientColor = (Color){ 26, 32, 135, 255 };
+  Vector3 ambientColorNormalized = (Vector3){ ambientColor.r/255.0f, ambientColor.g/255.0f, ambientColor.b/255.0f };
+  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "ambientColor"), &ambientColorNormalized, SHADER_UNIFORM_VEC3);
+  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "ambient"), &ambientIntensity, SHADER_UNIFORM_FLOAT);
+
+  metallicValueLoc = GetShaderLocation(lightingShader, "metallicValue");
+  roughnessValueLoc = GetShaderLocation(lightingShader, "roughnessValue");
+  emissiveIntensityLoc = GetShaderLocation(lightingShader, "emissivePower");
+  emissiveColorLoc = GetShaderLocation(lightingShader, "emissiveColor");
+  textureTilingLoc = GetShaderLocation(lightingShader, "tiling");
+
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, YELLOW, 4.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 3.3f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 8.3f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 2.0f, lightingShader));
+
+  // Setup material texture maps usage in shader
+  // NOTE: By default, the texture maps are always used
+  int usage = 1;
+  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexAlbedo"), &usage, SHADER_UNIFORM_INT);
+  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexNormal"), &usage, SHADER_UNIFORM_INT);
+  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexMRA"), &usage, SHADER_UNIFORM_INT);
+  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexEmissive"), &usage, SHADER_UNIFORM_INT);
 }
 
 void Game::drawLightingSpheres() {
   for (auto &light : lights) {
-    if (light.enabled) DrawSphereEx(light.position, 0.2f, 8, 8, light.color);
-    else DrawSphereWires(light.position, 0.2f, 8, 8, ColorAlpha(light.color, 0.3f));
+    Color lightColor = (Color){
+        (unsigned char)(light.color[0]*255),
+        (unsigned char)(light.color[1]*255),
+        (unsigned char)(light.color[2]*255),
+        (unsigned char)(light.color[3]*255) };
+
+    if (light.enabled) DrawSphereEx(light.position, 0.2f, 8, 8, lightColor);
+    else DrawSphereWires(light.position, 0.2f, 8, 8, ColorAlpha(lightColor, 0.3f));
   }
 }

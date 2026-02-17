@@ -23,4 +23,9 @@ private:
   Model skybox;
   Shader lightingShader;
   std::vector<Light> lights;
+  int metallicValueLoc;
+  int roughnessValueLoc;
+  int emissiveIntensityLoc;
+  int emissiveColorLoc;
+  int textureTilingLoc;
 };
