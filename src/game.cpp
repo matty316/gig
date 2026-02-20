@@ -27,6 +27,12 @@ void Game::update() {
   float cameraPos[3] = { camera.pos().x, camera.pos().y, camera.pos().z };
   SetShaderValue(lightingShader, lightingShader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
 
+  if (IsKeyPressed(KEY_EQUAL)) lights[0].intensity += 0.05f;
+  if (IsKeyPressed(KEY_MINUS)) lights[0].intensity -= 0.05f;
+
+  if (lights[0].intensity < 0.0f) lights[0].intensity = 0.0f;
+  if (lights[0].intensity > 1.0f) lights[0].intensity = 1.0f;
+
   if (IsKeyPressed(KEY_D)) { lights[0].enabled = !lights[0].enabled; }
   if (IsKeyPressed(KEY_R)) { lights[1].enabled = !lights[1].enabled; }
   if (IsKeyPressed(KEY_G)) { lights[2].enabled = !lights[2].enabled; }
@@ -114,7 +120,7 @@ void Game::setupLighting() {
   float ambientStrength = 0.05f;
   SetShaderValue(lightingShader, ambientLoc, (float[4]){ ambientStrength, ambientStrength, ambientStrength, 1.0f }, SHADER_UNIFORM_VEC4);
 
-  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 0.1f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 0.5f, lightingShader));
 
   lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 1.0f, lightingShader));
   lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 1.0f, lightingShader));

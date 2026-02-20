@@ -25,6 +25,5 @@ private:
   Model skybox, floor;
   Shader lightingShader;
   int tilingLoc;
-  float dirLightIntensity = 0.5f;
   std::vector<Light> lights;
 };
