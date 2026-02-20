@@ -17,15 +17,14 @@ private:
   void drawSkybox();
   void setupLighting();
   void drawLightingSpheres();
+  void setupFloor();
+  void drawFloor();
 
   PlayerCamera camera;
   GameObject player;
-  Model skybox;
+  Model skybox, floor;
   Shader lightingShader;
+  int tilingLoc;
+  float dirLightIntensity = 0.5f;
   std::vector<Light> lights;
-  int metallicValueLoc;
-  int roughnessValueLoc;
-  int emissiveIntensityLoc;
-  int emissiveColorLoc;
-  int textureTilingLoc;
 };

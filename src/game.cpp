@@ -11,10 +11,10 @@ void Game::init() {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
   ToggleFullscreen();
   SetTargetFPS(60);
-  player.init("models/old_car_new.glb");
-  camera.init(player);
   setupLighting();
-  player.setupModelMaterials(lightingShader);
+  player.init("models/car/Car2.obj", "models/car/car2_red.png", lightingShader, 0.5f);
+  camera.init(player);
+  setupFloor();
   loadSkybox();
   DisableCursor();
 }
@@ -26,6 +26,13 @@ void Game::update() {
 
   float cameraPos[3] = { camera.pos().x, camera.pos().y, camera.pos().z };
   SetShaderValue(lightingShader, lightingShader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
+
+  if (IsKeyPressed(KEY_D)) { lights[0].enabled = !lights[0].enabled; }
+  if (IsKeyPressed(KEY_R)) { lights[1].enabled = !lights[1].enabled; }
+  if (IsKeyPressed(KEY_G)) { lights[2].enabled = !lights[2].enabled; }
+  if (IsKeyPressed(KEY_B)) { lights[3].enabled = !lights[3].enabled; }
+
+  for (auto &light : lights) UpdateLight(lightingShader, light);
 }
 
 void Game::draw() {
@@ -37,12 +44,13 @@ void Game::draw() {
   drawSkybox();
 
   BeginShaderMode(lightingShader);
-  player.draw(lightingShader, textureTilingLoc, emissiveColorLoc, emissiveIntensityLoc);
+  drawFloor();
   EndShaderMode();
 
+  player.draw(lightingShader, tilingLoc);
   drawLightingSpheres();
 
-  DrawGrid(10000, 10.0f);
+  //DrawGrid(1000, 10.0f);
 
   camera.end();
 
@@ -64,6 +72,7 @@ void Game::cleanup() {
   UnloadShader(skybox.materials[0].shader);
   UnloadTexture(skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture);
   UnloadModel(skybox);
+  UnloadModel(floor);
   CloseWindow();
 }
 
@@ -87,50 +96,29 @@ void Game::loadSkybox() {
 }
 
 void Game::drawSkybox() {
-    rlDisableBackfaceCulling();
-    rlDisableDepthMask();
-    DrawModel(skybox, (Vector3){0, 0, 0}, 1.0f, WHITE);
-    rlEnableBackfaceCulling();
-    rlEnableDepthMask();
+  rlDisableBackfaceCulling();
+  rlDisableDepthMask();
+  DrawModel(skybox, (Vector3){0, 0, 0}, 1.0f, WHITE);
+  rlEnableBackfaceCulling();
+  rlEnableDepthMask();
 }
 
 void Game::setupLighting() {
-  lightingShader = LoadShader("shaders/pbr.vs", "shaders/pbr.fs");
-  lightingShader.locs[SHADER_LOC_MAP_ALBEDO] = GetShaderLocation(lightingShader, "albedoMap");
-  lightingShader.locs[SHADER_LOC_MAP_METALNESS] = GetShaderLocation(lightingShader, "mraMap");
-  lightingShader.locs[SHADER_LOC_MAP_NORMAL] = GetShaderLocation(lightingShader, "normalMap");
-  lightingShader.locs[SHADER_LOC_MAP_EMISSION] = GetShaderLocation(lightingShader, "emissiveMap");
-  lightingShader.locs[SHADER_LOC_COLOR_DIFFUSE] = GetShaderLocation(lightingShader, "albedoColor");
-
+  lightingShader = LoadShader("shaders/lighting.vs", "shaders/lighting.fs");
   lightingShader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(lightingShader, "viewPos");
-  int lightCountLoc = GetShaderLocation(lightingShader, "numOfLights");
-  int maxLightCount = MAX_LIGHTS;
-  SetShaderValue(lightingShader, lightCountLoc, &maxLightCount, SHADER_UNIFORM_INT);
+  lightingShader.locs[SHADER_LOC_MAP_DIFFUSE] = GetShaderLocation(lightingShader, "texture0");
 
-  float ambientIntensity = 0.02f;
-  Color ambientColor = (Color){ 26, 32, 135, 255 };
-  Vector3 ambientColorNormalized = (Vector3){ ambientColor.r/255.0f, ambientColor.g/255.0f, ambientColor.b/255.0f };
-  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "ambientColor"), &ambientColorNormalized, SHADER_UNIFORM_VEC3);
-  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "ambient"), &ambientIntensity, SHADER_UNIFORM_FLOAT);
+  tilingLoc = GetShaderLocation(lightingShader, "tiling");
 
-  metallicValueLoc = GetShaderLocation(lightingShader, "metallicValue");
-  roughnessValueLoc = GetShaderLocation(lightingShader, "roughnessValue");
-  emissiveIntensityLoc = GetShaderLocation(lightingShader, "emissivePower");
-  emissiveColorLoc = GetShaderLocation(lightingShader, "emissiveColor");
-  textureTilingLoc = GetShaderLocation(lightingShader, "tiling");
+  int ambientLoc = GetShaderLocation(lightingShader, "ambient");
+  float ambientStrength = 0.05f;
+  SetShaderValue(lightingShader, ambientLoc, (float[4]){ ambientStrength, ambientStrength, ambientStrength, 1.0f }, SHADER_UNIFORM_VEC4);
 
-  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 4.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 0.1f, lightingShader));
 
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, YELLOW, 4.0f, lightingShader));
-  // lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 3.3f, lightingShader));
-  // lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 8.3f, lightingShader));
-  // lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 2.0f, lightingShader));
-
-  int usage = 1;
-  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexAlbedo"), &usage, SHADER_UNIFORM_INT);
-  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexNormal"), &usage, SHADER_UNIFORM_INT);
-  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexMRA"), &usage, SHADER_UNIFORM_INT);
-  SetShaderValue(lightingShader, GetShaderLocation(lightingShader, "useTexEmissive"), &usage, SHADER_UNIFORM_INT);
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 1.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 1.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 1.0f, lightingShader));
 }
 
 void Game::drawLightingSpheres() {
@@ -146,4 +134,18 @@ void Game::drawLightingSpheres() {
       else DrawSphereWires(light.position, 0.2f, 8, 8, ColorAlpha(lightColor, 0.3f));
     }
   }
+}
+
+void Game::setupFloor() {
+  auto texture = LoadTexture("textures/floor.png");
+  auto mesh = GenMeshPlane(1000, 1000, 10, 10);
+  floor = LoadModelFromMesh(mesh);
+  floor.materials[0].shader = lightingShader;
+  floor.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+}
+
+void Game::drawFloor() {
+  auto tiling = 256;
+  SetShaderValue(lightingShader, tilingLoc, &tiling, SHADER_UNIFORM_INT);
+  DrawModel(floor, {0.0f, 0.0f, 0.0f}, 1.0f, WHITE);
 }

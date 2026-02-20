@@ -8,6 +8,6 @@
     "program": "build/app",
     "args": [],
     "request": "launch",
-    "adapter": "CodeLLDB",
+    "adapter": "GDB",
   },
 ]
