@@ -9,7 +9,7 @@
 void Game::init() {
   SetConfigFlags(FLAG_MSAA_4X_HINT);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
-  ToggleFullscreen();
+  //ToggleFullscreen();
   SetTargetFPS(60);
   setupLighting();
   player.init("models/car/Car2.obj", "models/car/car2_red.png", lightingShader, 0.5f);
@@ -120,11 +120,11 @@ void Game::setupLighting() {
   float ambientStrength = 0.05f;
   SetShaderValue(lightingShader, ambientLoc, (float[4]){ ambientStrength, ambientStrength, ambientStrength, 1.0f }, SHADER_UNIFORM_VEC4);
 
-  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 0.5f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_DIRECTIONAL, (Vector3){-0.2f, -1.0f, -0.3f}, (Vector3){0.0f, 0.0f, 0.0f}, WHITE, 0.2f, lightingShader));
 
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 1.0f, lightingShader));
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 1.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 1.0f, lightingShader));
-  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 1.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 1.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ -2.0f, 2.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, RED, 2.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 2.0f, 2.0f, 1.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, GREEN, 2.0f, lightingShader));
+  lights.emplace_back(CreateLight(LIGHT_POINT, (Vector3){ 1.0f, 2.0f, -2.0f }, (Vector3){ 0.0f, 0.0f, 0.0f }, BLUE, 2.0f, lightingShader));
 }
 
 void Game::drawLightingSpheres() {

@@ -29,16 +29,16 @@ Movement updateInput() {
     if (leftTrigger < leftTriggerDeadzone) leftTrigger = -1.0f;
     if (rightTrigger < rightTriggerDeadzone) rightTrigger = -1.0f;
 
-    movement.forward = IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
-    movement.backward = IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
-    movement.left = leftStickX < 0.0f || IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
-    movement.right = leftStickX > 0.0f || IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
-  } else {
-    movement.forward = IsKeyDown(KEY_SPACE);
-    movement.backward = IsKeyDown(KEY_LEFT_SHIFT);
-    movement.left = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
-    movement.right = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
+    if (IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)) movement.forward = true;
+    if (IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT)) movement.backward = true;
+    if (leftStickX < 0.0f || IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_LEFT_FACE_LEFT)) movement.left = true;
+    if (leftStickX > 0.0f || IsGamepadButtonDown(gamepad, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) movement.right = true;
   }
+
+  if (IsKeyDown(KEY_SPACE)) movement.forward = true;
+  if (IsKeyDown(KEY_LEFT_SHIFT)) movement.backward = true;
+  if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) movement.left = true;
+  if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) movement.right = true;
 
   return movement;
 }
