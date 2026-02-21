@@ -12,7 +12,7 @@ struct Movement {
 
 class GameObject {
 public:
-  void init(const std::string &modelPath, const std::string &texturePath, Shader shader, float scale = 1.0f);
+  void init(const std::string &modelPath, const std::string &texturePath, Shader shader, float scale = 1.0f, Vector3 position = {0.0f, 0.0f, 0.0f}, float mass = 100.0f);
   void update();
   void draw(Shader shader, int tilingLoc);
   void cleanup();

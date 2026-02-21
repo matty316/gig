@@ -9,11 +9,12 @@
 void Game::init() {
   SetConfigFlags(FLAG_MSAA_4X_HINT);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "gig");
-  //ToggleFullscreen();
+  ToggleFullscreen();
   SetTargetFPS(60);
   setupLighting();
   player.init("models/car/Car2.obj", "models/car/car2_red.png", lightingShader, 0.5f);
   camera.init(player);
+  setupEnv();
   setupFloor();
   loadSkybox();
   DisableCursor();
@@ -31,7 +32,6 @@ void Game::update() {
   if (IsKeyPressed(KEY_MINUS)) lights[0].intensity -= 0.05f;
 
   if (lights[0].intensity < 0.0f) lights[0].intensity = 0.0f;
-  if (lights[0].intensity > 1.0f) lights[0].intensity = 1.0f;
 
   if (IsKeyPressed(KEY_D)) { lights[0].enabled = !lights[0].enabled; }
   if (IsKeyPressed(KEY_R)) { lights[1].enabled = !lights[1].enabled; }
@@ -53,10 +53,9 @@ void Game::draw() {
   drawFloor();
   EndShaderMode();
 
+  drawEnv();
   player.draw(lightingShader, tilingLoc);
   drawLightingSpheres();
-
-  //DrawGrid(1000, 10.0f);
 
   camera.end();
 
@@ -74,6 +73,7 @@ void Game::run() {
 
 void Game::cleanup() {
   player.cleanup();
+  for (auto &obj : envObjects) obj.cleanup();
   UnloadShader(lightingShader);
   UnloadShader(skybox.materials[0].shader);
   UnloadTexture(skybox.materials[0].maps[MATERIAL_MAP_CUBEMAP].texture);
@@ -154,4 +154,20 @@ void Game::drawFloor() {
   auto tiling = 256;
   SetShaderValue(lightingShader, tilingLoc, &tiling, SHADER_UNIFORM_INT);
   DrawModel(floor, {0.0f, 0.0f, 0.0f}, 1.0f, WHITE);
+}
+
+void Game::setupEnv() {
+  auto building = GameObject();
+  building.init(
+    "models/test-building.glb",
+    "textures/brick.png",
+    lightingShader,
+    1.0f,
+    {5.0f, 0.0f, 10.0f},
+    10000.0f);
+  envObjects.push_back(building);
+}
+
+void Game::drawEnv() {
+  for (auto &obj : envObjects) obj.draw(lightingShader, tilingLoc);
 }

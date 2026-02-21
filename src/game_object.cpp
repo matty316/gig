@@ -14,14 +14,14 @@ void GameObject::addForce(Vector3 force) {
   forceAccum += force;
 }
 
-void GameObject::init(const std::string &modelPath, const std::string &texturePath, Shader shader, float scale) {
-  pos = {0.0f, 0.0f, 0.0f};
+void GameObject::init(const std::string &modelPath, const std::string &texturePath, Shader shader, float scale, Vector3 position, float mass) {
+  pos = position;
   velocity = Vector3Zero();
   acceleration = Vector3Zero();
   forceAccum = Vector3Zero();
   damping = 0.1f;
   rotationAngle = 0.0f;
-  setMass(100.0f);
+  setMass(mass);
   scaleVec = {scale, scale, scale};
   model = LoadModel(modelPath.c_str());
   setShader(shader);

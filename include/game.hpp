@@ -19,11 +19,14 @@ private:
   void drawLightingSpheres();
   void setupFloor();
   void drawFloor();
+  void setupEnv();
+  void drawEnv();
 
   PlayerCamera camera;
   GameObject player;
   Model skybox, floor;
   Shader lightingShader;
+  std::vector<GameObject> envObjects;
   int tilingLoc;
   std::vector<Light> lights;
 };
